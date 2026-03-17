@@ -10,5 +10,6 @@ echo -e "//========== Notepad++ template | Press F5 to opne the RUN window =====
 echo -e "//For running the file right away, use:\n" >> $NAME.js;
 sed -n '3,10 s/^/\/\//p' README.md >> $NAME.js;
 echo "created $NAME.js"
+"C:\Program Files\Notepad++\notepad++.exe" $NAME.js;
 fi
 exec bash;
