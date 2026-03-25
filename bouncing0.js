@@ -10,14 +10,14 @@
 //- to just open the directory path, use: 
 //- `"C:\Program Files\Git\git-bash.exe" -c 'cd "$(cygpath -u "$(CURRENT_DIRECTORY)")"; exec bash;`
 //
-const grid = [['.','.','.','.','.','.','.','.','.','.','.','.','.'],
+let grid = [  ['.','.','.','.','.','.','.','.','.','.','.','.','.'],
               ['.','.','.','.','.','.','.','.','.','.','.','.','.'],
               ['.','.','.','.','.','.','.','.','.','.','.','.','.'],
               ['.','.','.','.','.','.','.','.','.','.','.','.','.'],
               ['.','.','.','.','.','.','.','.','.','.','.','.','.'],
               ['.','.','.','.','.','.','.','.','.','.','.','.','.'],
               ['.','.','.','.','.','.','.','.','.','.','.','.','.'],
-              ['.','.','.','.','.','O','.','.','.','.','.','.','.'],
+              ['.','.','.','.','.','ඞ','.','.','.','.','.','.','.'],
               ['.','.','.','.','.','.','.','.','.','.','.','.','.'],
               ['.','.','.','.','.','.','.','.','.','.','.','.','.'],
               ['.','.','.','.','.','.','.','.','.','.','.','.','.'],
@@ -28,29 +28,61 @@ const grid = [['.','.','.','.','.','.','.','.','.','.','.','.','.'],
               ['.','.','.','.','.','.','.','.','.','.','.','.','.'],
 ];
 let velX = 1;
-const velY = 2;
-const isBall = (ch) => ch === 'O';
-const clearBall = (grid,x,y) => grid[y][x] = ".";
-const placeBall = (grid,x,y) => grid[y][x] = "O";
+let velY = 2;
+const isBall = (ch) => ch === 'ඞ';
+let posX = locateBall(grid)[0];
+let posY = locateBall(grid)[1];
+const clearBall = (grid,x,y) => {
+	grid[y][x] = ".";
+	return grid;
+}
+const placeBall = (grid,x,y) => {
+	grid[y][x] = "ඞ";
+	return grid;
+}
 
 function locateBall (grid) {
-	let x = -1;
-	let y = -1;
 		for (let i = 0; i < grid.length; i++) {
 		     for (let j = 0; j < grid[i].length;j++) {
 				 if (isBall(grid[i][j])) {
-				 x = j;
-				 y = i;
+				 return [j, i]; 
 				 break;
 				 }
 		}
 	}
-	return [x,y];
+	return [-1, -1];
 }
 
-function updateBall (grid) {
-	let [x,y] = locateBall(grid);
-	if 
+function updateBall(grid) {
+    let gridtmp = grid.map(row => row.slice());
+
+    clearBall(gridtmp, posX, posY);
+
+    const maxX = grid[0].length - 1;
+    const maxY = grid.length - 1;
+
+    if (posX + velX > maxX) {
+        posX = maxX;
+        velX *= -1;
+    } else if (posX + velX < 0) {
+        posX = 0;
+        velX *= -1;
+    }
+
+    if (posY + velY > maxY) {
+        posY = maxY;
+        velY *= -1;
+    } else if (posY + velY < 0) {
+        posY = 0;
+        velY *= -1;
+    }
+
+    posX += velX;
+    posY += velY;
+
+    placeBall(gridtmp, posX, posY);
+
+    return gridtmp;
 }
 
 
@@ -76,15 +108,13 @@ function drawTable (grid) {
 
 let val = 0;
 
-// 1. setInterval returns an ID we need for later
 const intervalId = setInterval(() => {
     console.clear();
-    console.log(val);
+	console.log(locateBall(grid));
+    grid = updateBall (grid);	
     console.log(drawTable(grid));
-    val++; 
-console.log(locateBall(grid));
-    if (val > 10) {
-        clearInterval(intervalId); 
-    }
+  if (val > 10) {
+       clearInterval(intervalId); 
+   }
 }, 100);
 
